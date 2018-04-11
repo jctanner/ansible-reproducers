@@ -1,0 +1,6 @@
+- name: Bounce the port
+  include_tasks: "bounce_port.yml"
+
+- name: mark ap_down as finished
+  set_fact:
+      role1_complete: True

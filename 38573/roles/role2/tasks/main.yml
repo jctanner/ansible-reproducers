@@ -1,0 +1,14 @@
+---
+#- name: Starting interface configuration
+#  set_fact:
+#    job_output: "{{ {} | combine ({ 'input_object' : interface, 'name' : role_path | basename, 'device_name': inventory_hostname | default('unknown') }) }}"
+
+- block:
+
+    - block:
+
+      - name: a nested task
+        debug: msg="foobar 1"
+
+      - name: a second nested task
+        debug: msg="foobar 2"

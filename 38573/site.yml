@@ -1,0 +1,19 @@
+---
+- name: bad ordering reproducer
+  hosts: all
+  connection: local
+  gather_facts: false
+  vars:
+      secondhost: el7host2
+
+  tasks:
+
+    - name: Call the first role only on one host
+      include_role:
+        name: role1
+      when: inventory_hostname is match(secondhost) 
+
+    - name: make sure nothing else runs until role1 finishes
+      assert:
+        that:
+            - "'role1_complete' in hostvars[secondhost]"
