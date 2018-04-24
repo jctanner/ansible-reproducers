@@ -2,7 +2,9 @@
 
 ## purpose
 
-Attempt to simulate ios_config at a moderate scale and reproduce https://github.com/ansible/ansible/issues/38892. This was used to find the fix in https://github.com/ansible/ansible/pull/39223
+Attempt to simulate ios_config at a moderate scale and reproduce https://github.com/ansible/ansible/issues/38892. 
+
+This was used along with https://github.com/ansible/ansible/pull/39205 to find the fix in https://github.com/ansible/ansible/pull/39223
 
 ## instructions
 
