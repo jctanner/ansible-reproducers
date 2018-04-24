@@ -2,7 +2,7 @@
 
 ## purpose
 
-Attempt to simulate ios_config at a moderate scale.
+Attempt to simulate ios_config at a moderate scale. This was used to find the fix in https://github.com/ansible/ansible/pull/39223
 
 ## instructions
 
