@@ -1,0 +1,24 @@
+[cisco-ios]
+{% for res in container_data['results'] %}
+{{ res['ansible_facts']['docker_container']['NetworkSettings']['IPAddress'] }} ansible_ssh_user=cisco ansible_ssh_pass={{ container_ssh_password }} container_id={{ res['ansible_facts']['docker_container']['Config']['Hostname'] }} container_name={{ res['ansible_facts']['docker_container']['Name'] }}
+{% endfor %} 
+
+{% for ix in range(0, (12000 - total_nodes|int)) %}
+{{ 'foobar' + ix|string }}
+{% endfor %}
+
+[cisco-ios:vars]
+device_os=cisco-ios
+cli_username=cisco 
+vault_cli_username=cisco 
+cli_password={{ container_ssh_password }}
+vault_cli_password={{ container_ssh_password }}
+vault_snmp_comm_readonly=ROCOMM 
+vault_snmp_comm_readwrite=RWCOMM 
+msit_buildingid=0 
+msit_region=0 
+msit_country=us 
+msit_city=nyc 
+msit_buildingname=zero 
+vault_imeapi_credential=none
+
