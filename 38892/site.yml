@@ -1,0 +1,22 @@
+- name: Run adhoc commands
+  strategy: free
+  #hosts: all[0]
+  #hosts: all
+  hosts: "{{ survey_hosts | lower }}"
+  connection: local
+  #connection: network_cli
+  gather_facts: false
+  ignore_errors: yes
+  vars:
+    cli:
+        host: "{{ inventory_hostname }}"
+        username: "{{ cli_username }}"
+        password: "{{ cli_password }}"
+        #timeout: 1
+        authorize: True
+  tasks:
+  - name: Backup current config
+    ios_config:
+      backup: yes
+      provider: "{{ cli }}"
+    register: backup_config
