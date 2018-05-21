@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#FORKS="5"
+FORKS="25"
+
+CONTAINER="ansible-el7:1.0"
+#CONTAINER="ansible-f27:1.0"
+#INVENTORY="inventory_generated.ini"
+INVENTORY="inventory_generated_keys.ini"
+
+CMD="cd /root/playbooks;"
+#CMD="$CMD pip install git+https://github.com/ansible/ansible;"
+#CMD="$CMD pip install ansible==2.5.3;"
+#CMD="$CMD pip install ansible==2.5.2;"
+#CMD="$CMD pip install ansible==2.5.1;"
+#CMD="$CMD pip install ansible==2.5.0;"
+CMD="$CMD pip install ansible==2.4.4.0;"
+
+#CMD="$CMD ANSIBLE_CALLBACK_WHITELIST='profile_tasks'"
+#CMD="$CMD PROFILE_TASKS_TASK_OUTPUT_LIMIT=100"
+#CMD="$CMD ANSIBLE_PIPELINING=1"
+
+EARGS=""
+EARGS="$EARGS -e 'REMOTE_USER=testuser'"
+EARGS="$EARGS -e 'REMOTE_BECOME=True'"
+
+CMD="$CMD time ansible-playbook -vvvv $EARGS --forks=$FORKS -i $INVENTORY site.yml"
+#CMD="$CMD time ansible-playbook -vvvv --forks=5 -i $INVENTORY site.yml"
+#CMD="$CMD time ansible-playbook -vvvv -i $INVENTORY site.yml"
+
+#docker run -v $(pwd):/root/playbooks centos7-ansible:2.5.0 /bin/bash -c 'cd /root/playbooks ; pwd ; ls -al'
+docker run -v $(pwd):/root/playbooks $CONTAINER /bin/bash -c "$CMD"

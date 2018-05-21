@@ -1,0 +1,4 @@
+[nodes]
+{% for res in container_data['results'] %}
+{{ res['ansible_facts']['docker_container']['NetworkSettings']['IPAddress'] }} ansible_ssh_private_key_file=sshkey container_id={{ res['ansible_facts']['docker_container']['Config']['Hostname'] }} container_name={{ res['ansible_facts']['docker_container']['Name'] }}
+{% endfor %} 

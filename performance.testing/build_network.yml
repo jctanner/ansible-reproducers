@@ -1,0 +1,27 @@
+- hosts: localhost
+  gather_facts: False
+  vars:
+      container_image: ansiscale:1.0
+      container_ssh_password: redhat1234
+  tasks:
+      - debug: var=total_nodes
+      - name: run the containers
+        docker_container:
+            privileged: True
+            name: "{{ item }}"
+            image: "{{ container_image }}"
+            state: started
+            volumes:
+                - /sys/fs/cgroup:/sys/fs/cgroup:ro
+        with_sequence: start=1 end={{ total_nodes|default('10') }} format=node_%02x
+        register: container_data
+      
+      - name: create the inventory
+        template:
+            src: inventory.j2
+            dest: inventory_generated.ini
+
+      - name: create the key based inventory
+        template:
+            src: inventory_keys.j2
+            dest: inventory_generated_keys.ini

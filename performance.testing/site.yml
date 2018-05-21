@@ -1,0 +1,86 @@
+- hosts: all
+  #strategy: free
+  #user: root
+  #user: testuser
+  user: "{{ REMOTE_USER | default('testuser') }}"
+  #become: True
+  become: "{{ REMOTE_BECOME | default(True) }}"
+  gather_facts: True
+  #gather_facts: False
+  #any_errors_fatal: True
+  vars:
+      ansible_ssh_private_key_file: sshkey
+      Environment: PRODUCTION
+      ntp_service_name: ntpd
+  tasks:
+      #- name: check connection
+      #  ping:
+ 
+      - name: Source necessary variables
+        include_vars: "{{ item }}"
+        with_items:
+          - main.yml
+          - "os_{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+
+      - name: Define OS type
+        set_fact:
+          os_type: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+      - name: Check for chronyd package
+        shell: "rpm -q chrony"
+        check_mode: no
+        failed_when: False
+        ignore_errors: True
+        register: var_chronyd_rpm
+
+      - name: Normalize Environment variable
+        set_fact:
+            environment_norm: Development
+        when: Environment not in ['UAT', 'PRODUCTION', 'DR']
+
+      - name: Normalize Environment variable
+        set_fact:
+            environment_norm: "{{ Environment }}"
+        when: Environment in ['UAT', 'PRODUCTION', 'DR']
+
+      - name: Normalize Environment variable
+        set_fact:
+            var_chronyd_status: True
+
+      - name: Normalize Environment variable
+        set_fact:
+            var_ntp_status: True
+
+      - name: Disable chronyd
+        service:
+          name: chronyd
+          state: stopped
+          enabled: no
+        register: var_chronyd_disable
+        when: var_chronyd_rpm.stdout.find('is not installed') == -1
+
+      - name: Enable NTP
+        service:
+          name: "{{ ntp_service_name }}"
+          state: started
+          enabled: yes
+        register: var_ntp_enable
+        tags: ntpd_audit
+
+      - name: Set chronyd remediation status
+        set_fact:
+          var_chronyd_status: False
+        when: var_chronyd_disable.changed and var_chronyd_rpm.stdout.find('is not installed') == -1
+
+      - name: Set ntp remediation status
+        set_fact:
+          var_ntp_status: False
+        when: var_ntp_enable.changed
+
+      #- name: Update database with results
+      #  command: echo "inserting into mysql"
+      #  #command: >
+      #  #  mysql --user={{ dbuser }} --password={{ dbpass }} mr_unix_patching --host=vmiksa69901mze --execute="INSERT INTO ntp_report (asset_name, environment, chronyd_status, ntp_status, os_type) VALUES ('{{ DeviceName }}', '{{ environment_norm }}', '{{ var_chronyd_status }}', '{{ var_ntp_status }}', '{{ os_type}}') ON DUPLICATE KEY UPDATE asset_name = '{{ DeviceName }}',environment = '{{ environment_norm }}',chronyd_status = '{{ var_chronyd_status }}',ntp_status = '{{ var_ntp_status }}',os_type = '{{ os_type }}'"
+      #  check_mode: no
+      #  become: no
+      #  delegate_to: 127.0.0.1
